@@ -1,0 +1,138 @@
+---
+title: "BEE 4750/5750 Homework 0"
+author: "Nimra Shakoor (ns924)"
+date: `j import Dates; Dates.Date(Dates.now())`
+weave_options:
+  term: true
+  results: tex
+  cache: off
+---
+
+<!-- This setups the environment and installs packages, but doesn't appear in the generated document -->
+<!-- You shouldn't need to modify this -->
+```julia; echo = false; results = "hidden"
+using Pkg
+Pkg.activate(".")
+Pkg.instantiate()
+```
+
+# Problem 1
+
+## Problem 1.1
+```julia
+function square_number(x) 
+  return x^2
+end
+```
+
+## Problem 1.2
+We can see that $5^2 =$ `j square_number(5)`.
+
+## Problem 1.3
+```julia
+using Plots
+
+y = []
+for i in -10:10
+  push!(y, square_number(i))
+end
+
+plot(-10:10, y, title="x^2", xlabel="x", ylabel="y", legend=false)
+```
+
+# Problem 2
+
+## Problem 2.1
+$\sqrt{x}$ must lie between $x/a$ and $a$ because $x$ divided by its square root should be its square root, or approximately $x/a$.
+
+## Problem 2.2
+```julia
+function newtons_method(x, a, error) 
+  while abs(x/a - a) > error
+    x = x/a
+    a = (x/a + a)/2
+  end
+  return a
+end
+```
+
+# Problem 3
+
+## Problem 3.1
+```julia
+  v = rand(20);
+```
+
+## Problem 3.2
+```julia
+function mean(vect) 
+  sum = 0
+  for i in vect
+    sum = sum + i
+  end
+  return sum/size(vect)[1]
+end
+
+function demean!(vect) 
+  avg = mean(vect)
+  for i in 1:length(vect)
+    vect[i] -= avg
+  end
+end
+```
+
+## Problem 3.3
+```julia
+vect = zeros(10);
+for i in 3:8
+  vect[i] = 6
+end
+
+vect
+```
+
+## Problem 3.4
+```julia
+mat = rand(5, 5);
+for col in 1:5
+  demean!(mat[:, col])
+end
+
+mat
+```
+
+# Problem 4
+
+## Problem 4.1
+```julia
+using Distributions
+my_lognormal_dist = LogNormal(log(0.03), 0.005)
+y_t = rand(my_lognormal_dist, 100);
+```
+
+## Problem 4.2
+```julia
+function simulation(a, y_t, b, q, T, X_0) 
+  X_f = []
+  for i in 1:T
+    push!(X_f, X_0)
+    X_t = X_0 + a + y_t[i] + (X_0^q)/(1 + X_0^q) - b*X_0
+    X_0 = X_t
+  end
+  return X_f
+end
+```
+
+## Problem 4.3
+```julia
+using Plots
+
+X_0 = 1
+plot(1:100, simulation(0.4, y_t, 0.42, 2, 100, X_0), title="Lake Phosphorous Levels", xlabel="T (years)", ylabel="Phosphorous Level", legend=false)
+```
+
+The lake phosphorous levels appear logarithmic––there seems to be a maximum amount of phorphorous possible within the lake.
+
+# References
+Carpenter, S. R., Ludwig, D., & Brock, W. A. (1999). Management of Eutrophication for Lakes Subject to Potentially Irreversible Change. Ecological Applications, 9(3), 751-771. https://doi.org/10.2307/2641327
+Quinn, J. D., Reed, P. M., & Keller, K. (2017). Direct policy search for robust multi-objective management of deeply uncertain socio-ecological tipping points. Environmental Modelling & Software, 92, 125-141. https://doi.org/10.1016/j.envsoft.2017.02.017
